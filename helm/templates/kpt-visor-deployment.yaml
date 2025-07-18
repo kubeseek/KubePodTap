@@ -1,0 +1,49 @@
+# Source: manifests/kpt-visor-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kpt-visor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: kpt-visor
+spec:
+  replicas: {{ .Values.kptVisor.replicas | default 1 }}
+  selector:
+    matchLabels:
+      app: kpt-visor
+  template:
+    metadata:
+      labels:
+        app: kpt-visor
+    spec:
+      securityContext:
+        runAsNonRoot: false
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: kpt-visor
+        image: {{ .Values.kptVisor.image }}
+        imagePullPolicy: IfNotPresent
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
+          seccompProfile:
+            type: RuntimeDefault
+        resources:
+          limits:
+            memory: {{ .Values.kptVisor.resources.limits.memory | quote }}
+            cpu: {{ .Values.kptVisor.resources.limits.cpu | quote }}
+          requests:
+            memory: {{ .Values.kptVisor.resources.requests.memory | quote }}
+            cpu: {{ .Values.kptVisor.resources.requests.cpu | quote }}
+        ports:
+        - containerPort: 8080
+        env:
+        - name: KPT_MANAGER_SERVICE
+          value: "kpt-manager.{{ .Release.Namespace }}.svc.cluster.local"
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+      serviceAccountName: kpt-visor-sa

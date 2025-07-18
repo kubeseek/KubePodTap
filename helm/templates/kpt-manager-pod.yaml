@@ -1,0 +1,56 @@
+# Source: manifests/kpt-manager-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kpt-manager
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: kpt-manager
+spec:
+  securityContext:
+    runAsNonRoot: false
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: kpt-manager
+    image: {{ .Values.kptManager.image }}
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+      seccompProfile:
+        type: RuntimeDefault
+    resources:
+      limits:
+        memory: {{ .Values.kptManager.resources.limits.memory | quote }}
+        cpu: {{ .Values.kptManager.resources.limits.cpu | quote }}
+      requests:
+        memory: {{ .Values.kptManager.resources.requests.memory | quote }}
+        cpu: {{ .Values.kptManager.resources.requests.cpu | quote }}
+    ports:
+    - containerPort: 8080
+    env:
+    - name: OPERATOR_NAMESPACE
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.namespace
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
+    - name: KPT_CRD_DIR
+      value: "/etc/kpt-operator/crds"
+    volumeMounts:
+    - name: operator-config
+      mountPath: /etc/kpt-operator
+    - name: kpt-crds
+      mountPath: /etc/kpt-operator/crds
+  volumes:
+  - name: operator-config
+    configMap:
+      name: kpt-operator-config
+  - name: kpt-crds
+    configMap:
+      name: kpt-crds
+  serviceAccountName: kpt-operator-sa

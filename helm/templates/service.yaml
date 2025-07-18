@@ -1,0 +1,14 @@
+# Source: manifests/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: kpt-manager
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    app: kpt-manager
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+  type: ClusterIP

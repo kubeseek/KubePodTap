@@ -1,0 +1,39 @@
+# Default values for kpt-operator Helm chart
+configmap:
+  name: kpt-operator-config
+  logLevel: info
+  probeInterval: 30s
+  visorPort: 8080
+  metricsEnabled: true
+kptManager:
+  image: docker.io/kubeseek/kpt-manager:latest
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: 500m
+    requests:
+      memory: 256Mi
+      cpu: 250m
+kptProbe:
+  image: docker.io/kubeseek/kpt-probe:latest
+  resources:
+    limits:
+      memory: 256Mi
+      cpu: 200m
+    requests:
+      memory: 128Mi
+      cpu: 100m
+kptVisor:
+  image: docker.io/kubeseek/kpt-visor:latest
+  replicas: 1
+  resources:
+    limits:
+      memory: 1Gi
+      cpu: 500m
+    requests:
+      memory: 512Mi
+      cpu: 250m
+rbac:
+  enabled: true
+  kptOperator:
+    enabled: true

@@ -1,0 +1,13 @@
+{{- include "kpt-operator.labels" . | nindent 4 }}
+# Source: manifests/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.configmap.name | default "kpt-operator-config" }}
+  namespace: {{ .Release.Namespace }}
+data:
+  operator.yaml: |
+    logLevel: {{ .Values.configmap.logLevel | default "info" }}
+    probeInterval: {{ .Values.configmap.probeInterval | default "30s" }}
+    visorPort: {{ .Values.configmap.visorPort | default 8080 }}
+    metricsEnabled: {{ .Values.configmap.metricsEnabled | default true }}

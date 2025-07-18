@@ -1,0 +1,9 @@
+# Source: manifests/kpt-crds-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kpt-crds
+  namespace: {{ .Release.Namespace }}
+data:
+  kptmonitors.yaml: |
+    {{ .Files.Get "files/kptmonitors-crd.yaml" | nindent 4 }}

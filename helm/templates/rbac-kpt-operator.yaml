@@ -1,0 +1,25 @@
+# Source: manifests/rbac-kpt-operator.yaml
+{{- /* This file contains ClusterRole and ClusterRoleBinding for kpt-operator CR access */}}
+{{- if .Values.rbac.kptOperator.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kpt-operator-cr-access
+rules:
+- apiGroups: ["kpt.dev"]
+  resources: ["kptmonitors"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kpt-operator-cr-access-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: kpt-operator-cr-access
+subjects:
+- kind: ServiceAccount
+  name: kpt-operator-sa
+  namespace: {{ .Release.Namespace }}
+{{- end }}
